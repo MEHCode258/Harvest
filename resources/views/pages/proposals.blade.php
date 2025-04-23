@@ -20,9 +20,71 @@
     <ul id="suggestions" class="absolute left-0 right-0 bg-white border border-gray-300 rounded-lg mt-2 hidden z-10 shadow-lg"></ul>
 </div>
 
+<!-- List of Proposals -->
+<div class="bg-white shadow-lg rounded-lg p-6">
+    @if (session('success'))
+        <div class="bg-green-100 text-green-700 p-4 rounded mb-4">
+            {{ session('success') }}
+        </div>
+    @endif
+
+    @if ($proposals->isEmpty())
+        <p class="text-gray-600 text-center">No proposals available.</p>
+    @else
+        <ul class="divide-y divide-gray-200">
+            @foreach ($proposals as $proposal)
+                <li class="py-4">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h3 class="text-lg font-bold text-gray-800">{{ $proposal->title }}</h3>
+                            <p class="text-sm text-gray-600">{{ $proposal->content }}</p>
+                            <p class="text-sm text-gray-600">Estimate: ${{ $proposal->estimate }}</p>
+                            <p class="text-sm text-gray-500">{{ $proposal->created_at->format('M d, Y') }}</p>
+                            <p class="text-sm text-gray-600">
+                                <strong>Projects:</strong>
+                                @if (!empty($proposal->projects)) {{-- Assuming 'projects' is a JSON or string field --}}
+                                    @foreach (json_decode($proposal->projects) as $project)
+                                        <span class="text-blue-500">{{ $project->name }}</span>{{ !$loop->last ? ',' : '' }}
+                                    @endforeach
+                                @else
+                                    <span class="text-gray-500">No projects associated</span>
+                                @endif
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex flex-col space-y-2 mt-4">
+                        <!-- Preview PDF Button -->
+                        <form action="{{ route('proposals.preview-pdf', $proposal->id) }}" method="GET" target="_blank" class="w-full">
+                            @csrf
+                            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full">
+                                Preview PDF
+                            </button>
+                        </form>
+
+                        <!-- Edit Proposal Button -->
+                        <a href="{{ route('proposals.edit', $proposal->id) }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 text-center w-full">
+                            Edit
+                        </a>
+
+                        <!-- Delete Proposal Button -->
+                        <form action="{{ route('proposals.destroy', $proposal->id) }}" method="POST" class="w-full">
+                            @csrf
+                            @method('DELETE')
+                            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full">
+                                Delete
+                            </button>
+                        </form>
+                    </div>
+                </li>
+            @endforeach
+        </ul>
+    @endif
+</div>
+@endsection
+
+@section('scripts')
 <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
 
-<!-- Script for Search -->
 <script>
 $(document).ready(function () {
     const searchInput = $('#search');
@@ -97,8 +159,9 @@ $(document).ready(function () {
     });
 });
 </script>
+
 <script>
-    document.addEventListener('DOMContentLoaded', function () {
+document.addEventListener('DOMContentLoaded', function () {
     const projectSelect = document.getElementById('projects');
     const estimateInput = document.getElementById('estimate');
 
@@ -120,6 +183,9 @@ $(document).ready(function () {
     projectSelect.addEventListener('change', updateEstimate);
 });
 </script>
+@endsection
+
+@section('styles')
 <style>
     #suggestions {
         list-style-type: none;
@@ -137,81 +203,4 @@ $(document).ready(function () {
         background: #f0f0f0;
     }
 </style>
-
-<script>
-document.querySelectorAll('.preview-pdf-button').forEach(function (button) {
-    button.addEventListener('click', function (e) {
-        e.preventDefault();
-        const url = this.getAttribute('data-url');
-        window.open(url, '_blank');
-    });
-});
-    document.querySelectorAll('.preview-pdf-button').forEach(function (button) {
-        button.addEventListener('click', function (e) {
-            e.preventDefault();
-            const url = this.getAttribute('data-url');
-            window.open(url, '_blank');
-        });
-    });
-
-</script>
-<!-- List of Proposals -->
-<div class="bg-white shadow-lg rounded-lg p-6">
-    @if (session('success'))
-        <div class="bg-green-100 text-green-700 p-4 rounded mb-4">
-            {{ session('success') }}
-        </div>
-    @endif
-
-    @if ($proposals->isEmpty())
-        <p class="text-gray-600 text-center">No proposals available.</p>
-    @else
-        <ul class="divide-y divide-gray-200">
-    @foreach ($proposals as $proposal)
-    <li class="py-4">
-        <div class="flex justify-between items-center">
-            <div>
-                <h3 class="text-lg font-bold text-gray-800">{{ $proposal->title }}</h3>
-                <p class="text-sm text-gray-600">{{ $proposal->content }}</p>
-                <p class="text-sm text-gray-600">Estimate: ${{ $proposal->estimate }}</p>
-                <p class="text-sm text-gray-500">{{ $proposal->created_at->format('M d, Y') }}</p>
-                <p class="text-sm text-gray-600">
-                    <strong>Projects:</strong>
-                    @foreach ($proposal->projects as $project)
-                        <span class="text-blue-500">{{ $project->name }}</span>{{ !$loop->last ? ',' : '' }}
-                    @endforeach
-                </p>
-            </div>
-        </div>
-    </li>
-    <div class="flex flex-col space-y-2">
-
-        <!-- Preview PDF Button -->
-        <form action="{{ route('proposals.preview-pdf', $proposal->id) }}" method="GET" target="_blank" class="w-full">
-            @csrf
-            <button type="submit" class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600 w-full">
-                Preview PDF
-            </button>
-        </form>
-
-        <!-- Edit Proposal Button -->
-        <a href="{{ route('proposals.edit', $proposal->id) }}" class="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600 text-center w-full">
-            Edit
-        </a>
-
-        <!-- Delete Proposal Button -->
-        <form action="{{ route('proposals.destroy', $proposal->id) }}" method="POST" class="w-full">
-            @csrf
-            @method('DELETE')
-            <button type="submit" class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600 w-full">
-                Delete
-            </button>
-        </form>
-    </div>
-</div>
-                </li>
-            @endforeach
-        </ul>
-    @endif
-</div>
 @endsection

@@ -21,9 +21,4 @@ class Proposal extends Model
         return $this->belongsTo(\App\Models\Job::class, 'job_id');
     }
 
-    public function projects()
-{
-    return $this->belongsToMany(Project::class, 'project_proposal');
-}
-
 }
