@@ -1,0 +1,80 @@
+# 1. Version control
+.git/
+.gitignore
+.gitattributes
+
+# 2. Node.js dependencies and artifacts
+node_modules/
+npm-debug.log
+yarn-debug.log
+
+# 3. IDE/editor files
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# 4. Build outputs and static assets
+public/build/
+dist/
+build/
+out/
+tmp/
+temp/
+*.tmp
+
+# 5. Test and development files
+test/
+tests/
+coverage/
+.pytest_cache/
+
+# 6. PHP/Laravel specific
+/storage/
+!storage/app/
+!storage/app/public/
+!storage/app/private/
+!storage/framework/.gitignore
+!storage/logs/.gitignore
+bootstrap/cache/
+
+# 7. Environment and secrets
+.env
+.env.*
+*.env
+*.pem
+*.key
+*.crt
+
+# 8. Documentation and markdown
+README*
+*.md
+docs/
+
+# 9. Miscellaneous
+*.log
+*.bak
+*.old
+*.orig
+*.rej
+*.DS_Store
+Thumbs.db
+
+# 10. Project-specific
+.tinkerun/
+.local/
+local/
+
+# 11. Exclude Docker-related files from ignore
+!Dockerfile
+!docker-compose*
+
+# 12. Exclude composer files (keep composer.lock as per instructions)
+# (Do not ignore composer.lock)
+
+# 13. Exclude editor config
+.editorconfig
+
+# 14. Exclude other VCS
+.svn/
+.hg/
